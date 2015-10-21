@@ -10,9 +10,10 @@ import rtpipe.parsesdm as ps
 import rtpipe.parsecands as pc
 import pickle
 
+default_bdfdir = '/lustre/evla/wcbe/data/no_archive'
 logger = logging.getLogger(__name__)
 
-def read(filename, paramfile='', fileroot='', bdfdir='/lustre/evla/wcbe/data/realfast'):
+def read(filename, paramfile='', fileroot='', bdfdir=default_bdfdir):
     """ Simple parse and return metadata for pipeline for first scan
     """
 
@@ -22,7 +23,7 @@ def read(filename, paramfile='', fileroot='', bdfdir='/lustre/evla/wcbe/data/rea
     logger.info('Example pipeline:')
     state = rt.set_pipeline(filename, sc.popitem()[0], paramfile=paramfile, fileroot=fileroot, nologfile=True)
 
-def search(qname, filename, paramfile, fileroot, scans=[], telcalfile='', redishost='localhost', depends_on=None, bdfdir='/lustre/evla/wcbe/data/bunker'):
+def search(qname, filename, paramfile, fileroot, scans=[], telcalfile='', redishost='localhost', depends_on=None, bdfdir=default_bdfdir):
     """ Search for transients in all target scans and segments
     """
 
@@ -138,7 +139,7 @@ def plot_pulsar(workdir, fileroot, scans=[]):
     logger.info('Pulsar plotting for pkllist:', pkllist)
     pc.plot_psrrates(pkllist, outname=os.path.join(workdir, 'plot_' + fileroot + '_psrrates.png'))
 
-def getscans(filename, scans='', sources='', intent='', bdfdir='/lustre/evla/wcbe/data/realfast'):
+def getscans(filename, scans='', sources='', intent='', bdfdir=default_bdfdir):
     """ Get scan list as ints.
     First tries to parse scans, then sources, then intent.
     """
@@ -359,7 +360,7 @@ def lookforfile(lookdir, subname, changesonly=False):
     logger.info('Returning %s.' % fullname)
     return fullname
 
-def waitforsdm(filename, timeout=300):
+def waitforsdm(filename, timeout=300, bdfdir=default_bdfdir):
     """ Monitors filename (an SDM) to see when it is finished writing.
     timeout is time in seconds to wait from first detection of file.
     Intended for use on CBE.
@@ -368,7 +369,7 @@ def waitforsdm(filename, timeout=300):
     time_filestart = 0
     while 1:
         try:
-            sc,sr = sdmreader.read_metadata(filename)
+            sc,sr = sdmreader.read_metadata(filename, bdfdir=bdfdir)
         except RuntimeError:
             logger.info('File %s not found.' % filename)
         except IOError:
@@ -394,7 +395,7 @@ def waitforsdm(filename, timeout=300):
             logger.info('All bdfs written. Continuing.')
             break
 
-def sdmascal(filename, calscans='', bdfdir='/lustre/evla/wcbe/data/realfast'):
+def sdmascal(filename, calscans='', bdfdir=default_bdfdir):
     """ Takes incomplete SDM (on CBE) and creates one corrected for use in calibration.
     optional calscans is casa-like string to select scans
     """

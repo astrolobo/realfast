@@ -23,6 +23,7 @@ from realfast import queue_monitor, rtutils, mcaf_library
 # set up
 rtparams_default = os.path.join(os.path.join(os.path.split(os.path.split(mcaf_library.__file__)[0])[0], 'conf'), 'rtpipe_cbe.conf') # install system puts conf files here. used by queue_rtpipe.py
 telcaldir = '/home/mchammer/evladata/telcal'  # then yyyy/mm
+bdfdir = '/lustre/evla/wcbe/data/no_archive'
 workdir = os.getcwd()     # assuming we start in workdir
 redishost = os.uname()[1]  # assuming we start on redis host
 
@@ -77,7 +78,7 @@ class FRBController(object):
                     # 3) submit search job and add tail job to monitoring queue
                     if telcalfile:
                         logger.info('Submitting job to rtutils.search with args: %s %s %s %s %s %s %s %s' % ('default', filename, self.rtparams, '', str([scan]), telcalfile, redishost, os.path.dirname(config.bdfLocation.rstrip('/'))))
-                        lastjob = rtutils.search('default', filename, self.rtparams, '', [scan], telcalfile=telcalfile, redishost=redishost, bdfdir=os.path.dirname(config.bdfLocation.rstrip('/')))
+                        lastjob = rtutils.search('default', filename, self.rtparams, '', [scan], telcalfile=telcalfile, redishost=redishost, bdfdir=bdfdir)
                         queue_monitor.addjob(lastjob.id)
                     else:
                         logger.info('No calibration available. No job submitted.')

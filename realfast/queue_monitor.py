@@ -131,7 +131,7 @@ def monitor(qname, triggered, archive, verbose, production, threshold, slow):
 
                 # 4-1) Run slow transients search
                 if slow > 0:
-                    logger.info('Creating measurement set for %s' & d['filename'])
+                    logger.info('Creating measurement set for %s' % d['filename'])
 
                     # Create ASDMBinary directory in our local SDM
                     ASDMBinarydir = os.path.join(os.path.basename(d['filename'].rstrip('/')), 'ASDMBinary')
@@ -148,8 +148,9 @@ def monitor(qname, triggered, archive, verbose, production, threshold, slow):
                         if not production:
                             logger.info('TEST MODE. Would create BDF softlink %s to %s' % (bdfLINK,bdfORIG) )
                         else:
-                            logger.debug('Creating softlink %s to BDF %s' % (bdfLINK,bdfORIG) )
-                            os.symlink(bdfORIG,bdfLINK)
+                            if not os.path.exists(bdfLINK):
+                                logger.debug('Creating softlink %s to BDF %s' % (bdfLINK,bdfORIG) )
+                                os.symlink(bdfORIG,bdfLINK)
 
                     # Submit slow-processing job to our alternate queue.
                     allscanstr = ','.join(str(s) for s in sc.keys())
@@ -193,11 +194,11 @@ def monitor(qname, triggered, archive, verbose, production, threshold, slow):
         time.sleep(1)
 
 
-@click.command()
-@click.argument('filename')
-@click.argument('workdir')
-@click.option('--goodscans', help='List of scans to archive. Default is to archive all.')
-@click.option('--production', help='Run code in full production mode (otherwise just runs as test)', is_flag=True)
+#@click.command()
+#@click.argument('filename')
+#@click.argument('workdir')
+#@click.option('--goodscans', help='List of scans to archive. Default is to archive all.')
+#@click.option('--production', help='Run code in full production mode (otherwise just runs as test)', is_flag=True)
 def movetoarchive(filename, workdir, goodscans=None, production=False):
     """ Moves sdm and bdf associated with filename to archive.
     filename is sdmfile. workdir is place with file.

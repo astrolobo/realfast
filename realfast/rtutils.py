@@ -119,13 +119,17 @@ def plot_cand(workdir, fileroot, scans=[], candnum=-1):
     """ Visualize a candidate
     """
 
-    pkllist = []
-    for scan in scans:
-        pklfile = os.path.join(workdir, 'cands_' + fileroot + '_sc' + str(scan) + '.pkl')
-        if os.path.exists(pklfile):
-            pkllist.append(pklfile)
+    mergepkl = os.path.join(workdir, 'cands_' + fileroot + '_merge.pkl')
 
-    pc.plot_cand(pkllist, candnum=candnum)
+    if not os.path.exists(mergepkl):
+        pkllist = []
+        for scan in scans:
+            pklfile = os.path.join(workdir, 'cands_' + fileroot + '_sc' + str(scan) + '.pkl')
+            if os.path.exists(pklfile):
+                pkllist.append(pklfile)
+        pc.merge_cands(pkllist, fileroot)
+
+    pc.plot_cand(mergepkl, candnum=candnum)
 
 def plot_pulsar(workdir, fileroot, scans=[]):
     """

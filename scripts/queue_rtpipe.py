@@ -7,6 +7,7 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+import uuid
 import os, argparse, time, shutil
 from realfast import rtutils
 
@@ -55,15 +56,17 @@ if __name__ == '__main__':
     elif mode == 'search':
         from rq import Queue
         from redis import Redis
+        from realfast.queue_monitor import addjob
 
         q = Queue(qpriority, connection=Redis())
         lastjob = rtutils.search(qpriority, filename, paramfile, fileroot, scans=scans)  # default TARGET intent
+        addjob(lastjob.id)
 
     elif mode == 'rtsearch':
         """ Real-time search on cbe. First copies sdm into workdir, then looks for telcalfile (optionally waiting with timeout), then queues jobs.
         """
 
-        import queue_monitor
+        from realfast.queue_monitor import addjob
 
         # copy data into place
         rtutils.rsyncsdm(filename, workdir)
@@ -77,7 +80,7 @@ if __name__ == '__main__':
         # submit search job and add tail job to monitoring queue
         if telcalfile:
             lastjob = rtutils.search(qpriority, filename, paramfile, fileroot, scans, telcalfile=telcalfile, redishost=redishost)
-            queue_monitor.addjob(lastjob.id)
+            addjob(lastjob.id)
         else:
             logger.info('No calibration available. No job submitted.')
 
